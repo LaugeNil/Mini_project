@@ -4,3 +4,8 @@ The robot has to solve the following tasks:
 2. find entry
 3. enter through entry
 4. find exit; robot is not allowed to cross the lines
+
+
+Lauge Vogdrup Nilsson, Rasmus Bob Michno Kristensen, Simon Jensen,  
+
+Tobias Emil Brondbjerg, Victor Vestring-Andersen. 
