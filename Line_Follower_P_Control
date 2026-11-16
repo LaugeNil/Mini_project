@@ -1,0 +1,66 @@
+#include <Zumo32U4.h>
+
+Zumo32U4Motors motors;
+Zumo32U4LineSensors lineSensors;
+Zumo32U4Buzzer buzzer;
+Zumo32U4ButtonA buttonA;
+
+const int NUM_SENSORS = 5;
+uint16_t lineSensorValues[NUM_SENSORS];
+
+const int s = 2;
+const float K_p = s*0.3;
+const int speed = s * 100;
+const int threshold = 1350;
+
+void printReadingsToSerial()
+{
+  Serial.println(
+    String(lineSensorValues[0]) + " " +
+    String(lineSensorValues[1]) + " " +
+    String(lineSensorValues[2]) + " " +
+    String(lineSensorValues[3]) + " " +
+    String(lineSensorValues[4])
+  );
+}
+
+void readLineSensors(){
+  lineSensors.read(lineSensorValues, QTR_EMITTERS_ON);
+  printReadingsToSerial();
+}
+
+void forward(){
+  motors.setSpeeds(speed, speed);
+}
+
+void setup() {
+  lineSensors.initFiveSensors();
+  Serial.begin(9600);
+  buttonA.waitForButton();
+  delay(1000);
+
+  while(lineSensorValues[4]<= threshold){
+    readLineSensors();
+    if (lineSensorValues[0] >= threshold) {
+      motors.setSpeeds(-speed,0);
+    }
+    else forward();
+
+  }
+}
+
+void loop() {
+  readLineSensors();
+  int e = threshold - int(lineSensorValues[4]);  
+  int u = K_p * e;
+  Serial.println(String(u));
+  if (lineSensorValues[3] >= threshold) {
+    motors.setSpeeds(-speed,0);
+  }
+  else if (lineSensorValues[4] <= threshold){
+    motors.setSpeeds(speed,speed-u);
+  }
+  else if (lineSensorValues[4] >= threshold){
+    motors.setSpeeds(speed+u,speed);
+  }
+}
